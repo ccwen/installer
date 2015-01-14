@@ -31,7 +31,7 @@ var RawgitApp=React.createClass({
 		if (!ksana || !ksana.filesizes)  return <div>Error ksana.js</div>
 		var totalsize=ksana.filesizes.reduce(function(i,acc){return acc+i},0);
 		return <div>
-				<table className="table">
+				<table className="table ksanainfo">
 					<tr><td>ID</td><td>{ksana.dbid}</td></tr>
 					<tr><td>Title</td><td>{ksana.title} </td></tr>
 					<tr><td>Date</td><td>{liveupdate.humanDate(ksana.date)} </td></tr>
@@ -55,7 +55,7 @@ var RawgitApp=React.createClass({
 			<div>
 				<button onClick={this.getksanajs} 
 				className="input btn btn-large btn-primary center-block">Get Info</button>
-			</div><br/>
+			</div>
 			{this.appinfo()}
 			</div>
 			
