@@ -36,6 +36,7 @@ var OnlineApp=React.createClass({
 		actions.fetchKsanajs(app);
 	},
 	download:function(e) {
+		console.log("start download",this.state.ksanajs);
     	this.props.action("startDownload",this.state.ksanajs);
 	},
 	renderInstallButton:function(item,idx) {

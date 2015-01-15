@@ -269,7 +269,7 @@ var InstalledApp=React.createClass({displayName: "InstalledApp",
 		));
 	},
 	showTitle:function() {
-		if (!this.state.installed.length) return "Swipe right to install book.";
+		if (this.state.installed.length<2) return "Swipe right to install book.";
 		return "Select and click button to open.";
 	},
 	renderAccelon:function() {
@@ -283,7 +283,7 @@ var InstalledApp=React.createClass({displayName: "InstalledApp",
 		window.open("http://accelon.github.io");
 	},
 	renderWelcome:function() {
-		if (!this.state.installed.length && this.state.ready) {
+		if (this.state.installed.length<2 && this.state.ready) {
 			return React.createElement("div", null, 
 			React.createElement("img", {className: "swiperight", src: "swiperight.png"})
 			)			
@@ -419,6 +419,7 @@ var OnlineApp=React.createClass({displayName: "OnlineApp",
 		actions.fetchKsanajs(app);
 	},
 	download:function(e) {
+		console.log("start download",this.state.ksanajs);
     	this.props.action("startDownload",this.state.ksanajs);
 	},
 	renderInstallButton:function(item,idx) {
@@ -488,6 +489,10 @@ var RawgitApp=React.createClass({displayName: "RawgitApp",
 		
 		if (ksanajs) {
 			this.setState({ksanajs:ksanajs});	
+			var repouser=this.refs.repouser.getDOMNode().value;
+			var reponame=this.refs.reponame.getDOMNode().value;
+			localStorage.setItem("repouser",repouser);
+			localStorage.setItem("reponame",reponame);
 		} else {
 			this.setState({ksanajs:null,message:"Invalid Repository."});
 		}

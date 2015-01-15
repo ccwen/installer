@@ -89,7 +89,7 @@ var InstalledApp=React.createClass({
 		</tr>);
 	},
 	showTitle:function() {
-		if (!this.state.installed.length) return "Swipe right to install book.";
+		if (this.state.installed.length<2) return "Swipe right to install book.";
 		return "Select and click button to open.";
 	},
 	renderAccelon:function() {
@@ -103,7 +103,7 @@ var InstalledApp=React.createClass({
 		window.open("http://accelon.github.io");
 	},
 	renderWelcome:function() {
-		if (!this.state.installed.length && this.state.ready) {
+		if (this.state.installed.length<2 && this.state.ready) {
 			return <div>
 			<img className="swiperight" src="swiperight.png"/>
 			</div>			
