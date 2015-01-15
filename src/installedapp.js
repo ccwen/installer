@@ -5,12 +5,16 @@ var updatables=require("./stores").updatables;
 var Banner=require("./banner");
 var InstalledApp=React.createClass({
 	getInitialState:function(){
-		return {installed:[], selected:0, image:"banner.png"}
+		return {installed:[], message:"",selected:0, image:"banner.png",ready:false}
 	},
 	mixins:[Reflux.listenTo(store,"onData"),Reflux.listenTo(updatables,"onUpdatablesChanged")],
 	onData:function(installed) {
-		this.setState({installed:installed});
-		if (installed&&installed.length) setTimeout(actions.checkHasUpdate,3000);
+		this.setState({installed:installed,ready:true});
+
+		if (installed&&installed.length) setTimeout(actions.checkHasUpdate,10000);
+	},
+	propTypes:{
+		action:React.PropTypes.func.isRequired
 	},
 	select:function(e) {
 		var target=e.target;
@@ -29,18 +33,37 @@ var InstalledApp=React.createClass({
 	componentDidMount:function() {
 		actions.fetchInstalledApp();
 	},
-	askDownload:function() {
-
+	deleteApp:function(e) {
+		var path=e.target.dataset['path'];
+		if (path && path!="installer") {
+			console.log("delete app",path);
+			if (kfs&&kfs.deleteApp){
+				kfs.deleteApp(path);
+				this.deleting=true;
+				setTimeout(function(){
+					actions.fetchInstalledApp();
+					this.deleting=false;
+				},2000);
+			} 
+		}
 	},
-	deleteApp:function() {
-
+	opendb:function(e) {
+		if (this.deleting) return;
+		this.setState({deletable:false});
+		var path=e.target.dataset['path'];
+		ksanagap.switchApp(path);
 	},
 	onUpdatablesChanged:function(updatables) {
 		this.setState({installed:updatables});
 	},
+	download:function(e) {
+		var n=e.target.dataset['n'];
+		var ksanajs=this.state.installed[n];
+		this.props.action("startDownload",ksanajs);
+	},
 	renderUpdateButton:function(item,idx) {
 		if (item.hasUpdate) {
-			return <a data-n={idx} onClick={this.askDownload} className="btn btn-warning">Update</a>
+			return <a data-n={idx} onClick={this.download} className="btn btn-warning">Update</a>
 		}
 	},
 	renderDeleteButton:function(item,idx) {
@@ -57,16 +80,16 @@ var InstalledApp=React.createClass({
 		}
 	},
 	renderItem:function(item,idx) {
-		var classes="";
+		var classes="installedtr";
 		if (item.path=="installer" && !item.hasUpdate) return <div></div>;
-		if (idx==this.state.selected) classes="info";
+		if (idx==this.state.selected) classes+=" info";
 		return (<tr data-i={idx}  onClick={this.select} key={"i"+idx} className={classes} >
 			<td>{this.renderCaption(item,idx)} {this.renderUpdateButton(item,idx)}</td>
 			<td>{this.renderDeleteButton(item,idx)}</td>
 		</tr>);
 	},
 	showTitle:function() {
-		if (!this.state.installed.length) return "Installed Books";
+		if (!this.state.installed.length) return "Swipe right to install book.";
 		return "Select and click button to open.";
 	},
 	renderAccelon:function() {
@@ -79,13 +102,21 @@ var InstalledApp=React.createClass({
 	goWebsite:function() {
 		window.open("http://accelon.github.io");
 	},
+	renderWelcome:function() {
+		if (!this.state.installed.length && this.state.ready) {
+			return <div>
+			<img className="swiperight" src="swiperight.png"/>
+			</div>			
+		} return null;
+	},
 	render:function() { 
-		return <div className="panel panel-primary">
+		return <div className="panel panel-info">
 		  <Banner image={this.state.image}/>
 		  <div className="panel-heading">
 		    <h3 className="panel-title">{this.showTitle()}</h3>
 		  </div>
 		  <div className="panel-body installedapplist">
+		  	{this.renderWelcome()}
 			<table className="table installed">
 				<tbody>
 				{this.state.installed.map(this.renderItem)}

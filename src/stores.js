@@ -4,7 +4,7 @@ var liveupdate=require("ksana2015-webruntime").liveupdate;
 var remoteapplistjs="http://accelon.github.io/applist.js";
 var downloaded_apps=[];
 var findAppById=function(id) {
-  var r=apps.filter(function(app) { return app.dbid==id}  );
+  var r=downloaded_apps.filter(function(app) { return app.dbid==id}  );
   if (r.length) return r[0];
 }
 
@@ -22,7 +22,8 @@ var store_online=Reflux.createStore({
 		var that=this;
 		console.log("jsonp",remoteapplistjs);
 		liveupdate.jsonp(remoteapplistjs,function(data){
-			this.trigger(data);
+			console.log("jsonp return from",remoteapplistjs,data)
+			this.trigger(data||[]);
 		},this);
 	},
 });
@@ -45,8 +46,9 @@ var store_rawgit=Reflux.createStore({
 	onFetchRawgit:function(repouser,reponame) {
 		var url="http://rawgit.com/"+repouser+"/"+reponame+"/master/ksana.js";
 		var that=this;
+		console.log("jsonp",url);
 		liveupdate.jsonp(url,reponame,function(data){
-			console.log("trigger",data)
+			console.log("jsonp return from",url,data)
 			this.trigger(data);
 		},this);
 	}
@@ -60,7 +62,8 @@ var store_downloadable=Reflux.createStore({
 			this.trigger(data);
 		},this);
 	}	
-})
+});
+
 
 module.exports={installed:store_installed, online:store_online, 
 	rawgit:store_rawgit,updatables:store_updatables,downloadable:store_downloadable};

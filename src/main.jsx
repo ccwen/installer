@@ -4,12 +4,10 @@ var Swipe=require("ksana2015-swipe");
 var InstalledApp=require("./installedapp");
 var OnlineApp=require("./onlineapp");
 var RawgitApp=require("./rawgitapp");
-
+var Downloader=require("./downloader");
 var maincomponent = React.createClass({
   getInitialState:function() {
-  	return {result:[]};
-  },
-  componentDidMount:function() {
+  	return {downloading:false};
   },
   renderMobile:function() {
      return (
@@ -18,13 +16,13 @@ var maincomponent = React.createClass({
                transitionEnd: this.onTransitionEnd, 
                swipeStart: this.onSwipeStart, swipeEnd: this.onSwipeEnd}, 
         E("div", {className: "swipediv"}, 
-          <InstalledApp/>
+          <InstalledApp action={this.action}/>
         ), 
         E("div", {className: "swipediv"}, 
-          <OnlineApp/>
+          <OnlineApp action={this.action} />
         ), 
         E("div", {className: "swipediv"}, 
-          <RawgitApp/>
+          <RawgitApp action={this.action}/>
         )
         )
       )
@@ -33,22 +31,38 @@ var maincomponent = React.createClass({
   renderPC:function() {
     return E("div", {className: "main"}, 
         E("div", {className: "swipediv col-md-4"}, 
-          <InstalledApp/>
+          <InstalledApp action={this.action}/>
         ), 
         E("div", {className: "swipediv col-md-4"}, 
-          <OnlineApp/>
+          <OnlineApp action={this.action}/>
         ), 
         E("div", {className: "swipediv col-md-4"}, 
-          <RawgitApp/>
+          <RawgitApp action={this.action}/>
         )
       )
   },
-  render: function() {  //main render routine
+  renderList:function() {
       if (ksanagap.platform=="chrome" || ksanagap.platform=="node-webkit") {
         return this.renderPC();
       } else {
         return this.renderMobile();
       }
+  },
+  action:function(type,app) {
+    if (type=="startDownload") {
+      this.setState({app:app,downloading:true});  
+    } else if (type=="cancelDownload") {
+      this.setState({app:null,downloading:false});
+    }
+  },
+  render: function() {  //main render routine
+    if (this.state.downloading) {
+      return <div className="main">
+          <Downloader app={this.state.app} action={this.action}/>
+        </div>
+    } else {
+      return this.renderList();
+    }
   }
 
 });

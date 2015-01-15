@@ -5,10 +5,12 @@
 .applist {overflow-y:auto;height:90%;}
 .installedapplist {overflow-y:auto;height:70%;}
 
+.installedtr {cursor:pointer;}  /*for ios to be clickable*/
 .installed {font-size:100%;}
 .downloadable {font-size:100%;}
 .banner {width:100%;}
 .appbtn {font-size:100%;}
+.swiperight {width:100%;}
 /* installed app*/
 a.caption {cursor:pointer;}
 .footer {font-size:60%;}

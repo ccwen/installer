@@ -9,6 +9,9 @@ var RawgitApp=React.createClass({
 		var reponame=localStorage.getItem("reponame") || "nanchuan";
 		return {ksanajs:null,repouser:repouser,reponame:reponame,message:""};
 	},
+	propTypes:{
+		action:React.PropTypes.func.isRequired
+	},
 	onData:function(ksanajs) {
 		
 		if (ksanajs) {
@@ -20,7 +23,11 @@ var RawgitApp=React.createClass({
 	getksanajs:function() {
 		var repouser=this.refs.repouser.getDOMNode().value;
 		var reponame=this.refs.reponame.getDOMNode().value;
+		this.setState({message:"fetching info"});
 		actions.fetchRawgit(repouser,reponame);
+	},
+	download:function() {
+		this.props.action("startDownload",this.state.ksanajs);
 	},
 	appinfo:function() {
 		if (!this.state.ksanajs) return <div>
@@ -35,15 +42,15 @@ var RawgitApp=React.createClass({
 					<tr><td>ID</td><td>{ksana.dbid}</td></tr>
 					<tr><td>Title</td><td>{ksana.title} </td></tr>
 					<tr><td>Date</td><td>{liveupdate.humanDate(ksana.date)} </td></tr>
-					<tr><td>Size</td><td>{liveupdate.humanFileSize(totalsize)}</td></tr>
+					<tr><td>Size</td><td>{liveupdate.humanFileSize(totalsize,true)}</td></tr>
 				</table>
 				<div>
-			<button className="input center-block btn btn-large btn-success">Download</button><br/>
+			<button onClick={this.download} className="input center-block btn btn-large btn-warning">Install</button><br/>
 			</div>
 		</div>
 	},
 	render:function() {
-		return <div className="panel panel-default ">
+		return <div className="panel panel-warning">
 			<div className="panel-heading">
 				<h3 className="panel-title">Install from Github</h3>
 			</div>

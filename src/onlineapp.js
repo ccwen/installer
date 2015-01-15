@@ -6,6 +6,9 @@ var liveupdate=require("ksana2015-webruntime").liveupdate;
 
 var OnlineApp=React.createClass({
 	mixins:[Reflux.listenTo(store,"onData"),Reflux.listenTo(downloadable,"onDownloadable")],
+	propTypes:{
+		action:React.PropTypes.func.isRequired
+	},
 	getInitialState:function() {
 		return {apps:[],message:"Getting List",selected:-1,downloadable:false};
 	},
@@ -18,13 +21,7 @@ var OnlineApp=React.createClass({
 	},
 	showTitle:function() {
 		if (!this.state.apps.length) return "Getting online app";
-		return "Total "+this.state.apps.length+" books, Click To Download";
-	},
-	renderDownload:function() {
-
-	},
-	askDownload:function(e) {
-
+		return "Total "+this.state.apps.length+" books, Click To Install";
 	},
 	onDownloadable:function(ksanajs){
 		this.setState({downloadable:true,ksanajs:ksanajs});
@@ -38,22 +35,29 @@ var OnlineApp=React.createClass({
 		this.setState({selected:i,downloadable:false});
 		actions.fetchKsanajs(app);
 	},
-	renderDownloadButton:function(item,idx) {
-		if (idx==this.state.selected && this.state.downloadable) {
-			var ksanajs=this.state.ksanajs;
-			if (!ksanajs || !ksanajs.filesizes) return null;
-			var totalsize=ksanajs.filesizes.reduce(function(i,acc){return acc+i},0);
-			return <div>
-			<a data-n={idx} onClick={this.askDownload} className="btn btn-warning pull-right">Download</a>
-			{" "+liveupdate.humanFileSize(totalsize)}
-			</div>
+	download:function(e) {
+    	this.props.action("startDownload",this.state.ksanajs);
+	},
+	renderInstallButton:function(item,idx) {
+		if (idx==this.state.selected) {
+			if (this.state.downloadable) {
+				var ksanajs=this.state.ksanajs;
+				if (!ksanajs || !ksanajs.filesizes) return null;
+				var totalsize=ksanajs.filesizes.reduce(function(i,acc){return acc+i},0);
+				return <div>
+				<a data-n={idx} onClick={this.download} className="btn btn-warning pull-right">Install</a>
+				{" "+liveupdate.humanFileSize(totalsize,true)}
+				</div>
+			} else {
+				return <span> fetching info</span>
+			}
 		}else return null;
 	},
 	renderItem:function(item,idx) {
-		var classes="";
-		if (idx==this.state.selected) classes="success";
+		var classes="installedtr";
+		if (idx==this.state.selected) classes+=" info";
 		return (<tr data-i={idx}  onClick={this.select} key={"i"+idx} className={classes} >
-			<td><a href="#" onClick={this.select}>{item.title}</a>{this.renderDownloadButton(item,idx)}</td>
+			<td><a href="#" onClick={this.select}>{item.title}</a>{this.renderInstallButton(item,idx)}</td>
 		</tr>);
 	},
 	downloadingmessage:function() {
