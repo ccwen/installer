@@ -2,7 +2,7 @@ jsonp_handler({
  "version": "1",
  "build": 383,
  "title": "installer",
- "minruntime": 4,
+ "minruntime": 1.3,
  "baseurl": "http://rawgit.com/ksanaforge/installer/master/",
  "description": "in　App download",
  "files": [
